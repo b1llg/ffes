@@ -1,7 +1,7 @@
 program main
    use m_precision, only : wp, ip
-   use m_mesh, only: generate2dgrid
-   use m_io, only : cliparse
+   use m_mesh, only: gen2dmesh
+   use m_io, only : cliparse, m2parav
 
    implicit none
    real(wp), allocatable :: nodes(:,:)
@@ -22,9 +22,11 @@ program main
 
    call cliparse()
 
-   call generate2dgrid(1.0_wp, 1.0_wp, 3_ip, 3_ip, 'E2LN8', nodes, elems)
+   call gen2dmesh(0.01_wp, 0.01_wp, 100_ip, 100_ip, 'E2LN4', nodes, elems)
+
+   call m2parav(nodes, elems, "genmesh.vtk")
 
    deallocate(nodes)
    deallocate(elems)
-
+   
 end program main

@@ -3,7 +3,7 @@ module m_mesh
    implicit none
    private
 
-   public :: generate2dgrid, GeneratedMesh
+   public :: gen2dmesh, GeneratedMesh
 
    type, abstract :: Mesh
       integer :: nnodes, nels
@@ -18,7 +18,7 @@ module m_mesh
    end type
 
 contains
-   subroutine generate2dgrid(dx, dy, nx, ny, eltype, nodes, elements)
+   subroutine gen2dmesh(dx, dy, nx, ny, eltype, nodes, elements)
       real(wp), intent(in) :: dx, dy
       integer(ip), intent(in) :: nx, ny
       character(len=5), intent(in) :: eltype
@@ -29,7 +29,7 @@ contains
 
       !> checks
       if (nx <= 0_ip .OR. ny <= 0_ip) then
-         print *, "Error while generating mesh in 'generate2dgrid':"
+         print *, "Error while generating mesh in 'gen2dmesh':"
          print *, "nx= ", nx, " and ny= ", ny
          stop
       end if
@@ -64,54 +64,59 @@ contains
       end do
 
       !> Generate Element/nodes list CONNEC
-      k=1 ! "First" row index (Node)
-      l=1 ! "Second" row index (Node)
+      k=1 ! "First" row node index
+      l=1 ! "Second" row node index
       m=1 ! Element counter
-      ! n=1 ! "First" Row counter
+      n=1 ! Row index
 
-      ! **********************
-      !
-      !     Element loops stop working at 3x3 element
-      !
-      ! **********************
+      ! do while (m <= nels) 
+      !    elements(m,1) = k    ! Node 1
+      !    elements(m,2) = k+1  ! Node 2
 
+      !    l = k + 1 + (nx + 1) ! Node 3, counter clock wise
 
-      do while (m <= nels) 
-         elements(m,1) = k    ! Node 1
-         elements(m,2) = k+1  ! Node 2
+      !    elements(m,3) = l
+      !    elements(m,4) = l-1 ! Node 4
 
-         l = k + 1 + (nx + 1) ! Node 3, counter clock wise
+      !    !> Prepare k for next row or next element
+      !    if (real(k/n) == real(nx)) then! Next row           
+      !       k = k + 2
+      !       n = n + 1
+      !    else ! next element
+      !       k = k + 1
+      !    end if
 
-         elements(m,3) = l
-         elements(m,4) = l-1 ! Node 4
+      !    print*, elements(m,:)
 
-         if (k == 3) then
-            print*,""
-         end if
-         !> Prepare k for next row or next element
-         if (k/2+1 == nx + 1) then! Next row
+      !    m = m + 1 ! Either way, element number increase
+      ! end do
 
-            ! n = n + 2             
-            k = k + 1
-         else ! next element
-            k = k + 1
-         end if
-
-         m = m + 1
+              !> Generate Element/nodes list CONNEC
+      k = 1 ! Start node index for the current element row
+      do j = 1, ny
+          do i = 1, nx
+              ! Corrected node numbering for a quad element
+              elements( (j-1)*nx + i, 1 ) = k
+              elements( (j-1)*nx + i, 2 ) = k + 1
+              elements( (j-1)*nx + i, 3 ) = k + nx + 2
+              elements( (j-1)*nx + i, 4 ) = k + nx + 1
+              k = k + 1 ! Move to the next node in the row
+          end do
+          k = k + 1 ! Move to the first node of the next row
       end do
 
-      print*," "
-      print*, "Node list (COOR)"
-      do i=1, nnodes
-         print*,i, nodes(i,:)
-      end do
+      ! print*," "
+      ! print*, "Node list (COOR)"
+      ! do i=1, nnodes
+      !    print*,i, nodes(i,:)
+      ! end do
 
-      print*, " "
-      print*, "Element list (CONNEC)"
-      do i=1, nels
-         print*,i, elements(i,:)
-      end do
+      ! print*, " "
+      ! print*, "Element list (CONNEC)"
+      ! do i=1, nels
+      !    print*,i, elements(i,:)
+      ! end do
 
       print*, "mesh_generated!"
-   end subroutine generate2dgrid
+   end subroutine gen2dmesh
 end module m_mesh
