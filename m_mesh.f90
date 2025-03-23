@@ -3,7 +3,20 @@ module m_mesh
    implicit none
    private
 
-   public :: generate2dgrid
+   public :: generate2dgrid, GeneratedMesh
+
+   type, abstract :: Mesh
+      integer :: nnodes, nels
+   end type
+
+   type, extends(Mesh) :: GeneratedMesh
+
+   end type
+
+   type, extends(Mesh) :: MeshFile
+      character(:), allocatable :: Filename
+   end type
+
 contains
    subroutine generate2dgrid(dx, dy, nx, ny, eltype, nodes, elements)
       real(wp), intent(in) :: dx, dy
