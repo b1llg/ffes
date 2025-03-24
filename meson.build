@@ -1,4 +1,7 @@
 project('ffes', 'fortran', meson_version: '>=0.49')
+
+exodus_dep = dependency('exodus', required = true)
+
 executable('ffes', 
     files(
         'ffes.f90',
