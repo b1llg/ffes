@@ -27,7 +27,7 @@ module m_elements
    end type E1QD
 
    type, extends(E2D) :: E2Q8
-      intege :: nnodes = 2
+      intege :: nnodes = 8
 
    end type E2Q8
    

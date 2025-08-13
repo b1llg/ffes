@@ -25,7 +25,7 @@ contains
       integer(ip), allocatable :: elements(:,:)
       real(wp), allocatable :: nodes(:, :)
 
-      integer(ip) ::  nnodes, nels, npel, i, j, k, l, m, n
+      integer(ip) ::  nnodes, nels, npel, i, j, k
 
       !> checks
       if (nx <= 0_ip .OR. ny <= 0_ip) then
@@ -64,34 +64,6 @@ contains
       end do
 
       !> Generate Element/nodes list CONNEC
-      k=1 ! "First" row node index
-      l=1 ! "Second" row node index
-      m=1 ! Element counter
-      n=1 ! Row index
-
-      ! do while (m <= nels) 
-      !    elements(m,1) = k    ! Node 1
-      !    elements(m,2) = k+1  ! Node 2
-
-      !    l = k + 1 + (nx + 1) ! Node 3, counter clock wise
-
-      !    elements(m,3) = l
-      !    elements(m,4) = l-1 ! Node 4
-
-      !    !> Prepare k for next row or next element
-      !    if (real(k/n) == real(nx)) then! Next row           
-      !       k = k + 2
-      !       n = n + 1
-      !    else ! next element
-      !       k = k + 1
-      !    end if
-
-      !    print*, elements(m,:)
-
-      !    m = m + 1 ! Either way, element number increase
-      ! end do
-
-              !> Generate Element/nodes list CONNEC
       k = 1 ! Start node index for the current element row
       do j = 1, ny
           do i = 1, nx
@@ -104,18 +76,6 @@ contains
           end do
           k = k + 1 ! Move to the first node of the next row
       end do
-
-      ! print*," "
-      ! print*, "Node list (COOR)"
-      ! do i=1, nnodes
-      !    print*,i, nodes(i,:)
-      ! end do
-
-      ! print*, " "
-      ! print*, "Element list (CONNEC)"
-      ! do i=1, nels
-      !    print*,i, elements(i,:)
-      ! end do
 
       print*, "mesh_generated!"
    end subroutine gen2dmesh

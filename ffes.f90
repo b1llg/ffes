@@ -22,9 +22,9 @@ program main
 
    call cliparse()
 
-   call gen2dmesh(0.01_wp, 0.01_wp, 100_ip, 100_ip, 'E2LN4', nodes, elems)
+   call gen2dmesh(1.0_wp, 1.0_wp, 10_ip, 10_ip, 'E2LN4', nodes, elems)
 
-   call m2parav(nodes, elems, "genmesh.vtk")
+   call m2parav(nodes, elems, "../genmesh.vtk")
 
    deallocate(nodes)
    deallocate(elems)
