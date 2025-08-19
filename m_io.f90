@@ -1,10 +1,12 @@
 module m_io
    use m_precision, only: ip, wp
+   use m_mesh, only: t_meshfile
+   use netcdf
    implicit none
 
    private
 
-   public cliparse, m2parav
+   public cliparse, m2parav, read_netcdf
 
 contains
 
@@ -14,7 +16,7 @@ contains
       argc = command_argument_count()
 
       if (argc > 0) then
-         print*, "FFES called with ", argc, " argument(s):"
+         print*, "GridPack called with ", argc, " argument(s):"
          if (mod(argc,2) /= 0) then ! Arguments count should be even
             print*, "ERROR: argument count should be even"
             stop
@@ -35,7 +37,7 @@ contains
             end if
          end do
       else
-         print*, "FFES called with no arguments"
+         print*, "GridPack called with no arguments"
       end if
 
    end subroutine cliparse
@@ -63,8 +65,8 @@ contains
 
       open(unit=10, file=trim(filename), action='write', iostat=ios)
       if (ios /= 0) then
-          write(*, '(a,i0)') 'Error opening file: ', ios
-          return
+         write(*, '(a,i0)') 'Error opening file: ', ios
+         return
       end if
 
       !> Write VTK header
@@ -76,19 +78,39 @@ contains
       !> Write node coordinates
       write(10, '(a,i0,a)') 'POINTS ', nnodes, ' float'
       do i = 1, nnodes
-          write(10, '(3e20.12)') nodes(i,1), nodes(i,2), nodes(i,3)
+         write(10, '(3e20.12)') nodes(i,1), nodes(i,2), nodes(i,3)
       end do
 
       !> Write element connectivity
       write(10, '(a,i0,a,i0,a)') 'POLYGONS ', nels, ' ', nels * 5, ' ' ! 5 = 4 nodes + 1 count
       do i = 1, nels
-          write(10, '(5i10)') 4, elements(i,1)-1, elements(i,2)-1, elements(i,3)-1, elements(i,4)-1  ! Counter-clockwise
+         write(10, '(5i10)') 4, elements(i,1)-1, elements(i,2)-1, elements(i,3)-1, elements(i,4)-1  ! Counter-clockwise
       end do
 
       close(10)
 
       print*, "Wrote Paraview VTK file: ", trim(filename)
 
-  end subroutine m2parav
+   end subroutine m2parav
 
+   subroutine read_netcdf(mesh)
+      type(t_meshfile),intent(inout) :: mesh
+      integer :: ncid,coordxid
+
+      call handle_nf90err(nf90_open(mesh%filename,nf90_nowrite, ncid))
+      call handle_nf90err(nf90_inq_varid(ncid, "coordx",coordxid))
+
+      print*,"ncid: ", ncid
+      print*,"coordxid: ", coordxid
+
+   end subroutine
+
+   subroutine handle_nf90err(status)
+      integer, intent ( in) :: status
+
+      if(status /= nf90_noerr) then
+         print *, trim(nf90_strerror(status))
+         stop "Stopped"
+      end if
+   end subroutine
 end module m_io

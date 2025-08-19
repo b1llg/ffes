@@ -3,18 +3,20 @@ module m_mesh
    implicit none
    private
 
-   public :: gen2dmesh, GeneratedMesh
+   public :: gen2dmesh, t_generatedmesh, t_meshfile
 
-   type, abstract :: Mesh
-      integer :: nnodes, nels
+   type, abstract :: t_mesh
+      integer :: nblocks, nnodes, nels
    end type
 
-   type, extends(Mesh) :: GeneratedMesh
+   type, extends(t_mesh) :: t_generatedmesh
 
    end type
 
-   type, extends(Mesh) :: MeshFile
-      character(:), allocatable :: Filename
+   type, extends(t_mesh) :: t_meshfile
+      character(:), allocatable :: filename
+   contains
+      procedure :: set_filename => set_filename_meshfile
    end type
 
 contains
@@ -79,4 +81,11 @@ contains
 
       print*, "mesh_generated!"
    end subroutine gen2dmesh
+
+   subroutine set_filename_meshfile(this, filename)
+      class(t_meshfile) :: this
+      character(len=*) :: filename
+
+      this%filename = trim(filename)
+   end subroutine
 end module m_mesh

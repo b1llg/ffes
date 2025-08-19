@@ -31,6 +31,11 @@
 *.out
 *.app
 
+# outputs
+*.vtk
+
 # Misc
 **/.vscode
 *builddir
+*build
+

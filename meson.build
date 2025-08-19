@@ -1,10 +1,16 @@
-project('ffes', 'fortran', meson_version: '>=0.49')
+#--- Project
+project('GridPack', 'fortran', meson_version: '>=0.49')
 
-# exodus_dep = dependency('exodus', required = true)
+#--- Dependency
+netcdf_dep = dependency('netcdf',language: 'fortran',required: true)
+#petsc_dep = dependency('petsc', required:false)
 
-executable('ffes', 
+
+executable('gridpack', 
     files(
-        'ffes.f90',
+        'main.f90',
         'm_mesh.f90', 
         'm_precision.f90', 
-        'm_io.f90'))
+        'm_io.f90'),
+        dependencies : [netcdf_dep]#,petsc_dep]
+)
